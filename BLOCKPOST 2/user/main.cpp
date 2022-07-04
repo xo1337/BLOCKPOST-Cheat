@@ -395,6 +395,7 @@ void OnDraw( )
 
 			if ( playerData )
 			{
+				int actorAim;
 				for ( unsigned int i = 0; i < playerData->max_length; i++ )
 				{
 					auto player = playerData->vector[ i ];
@@ -431,26 +432,33 @@ void OnDraw( )
 								myCamera* camira;
 							};
 
-							float bestDistance = 0;
+							//float bestDistance = 0;
 							auto angles = utils::GetDistanceAndAngle( ( ( cscamera* )( ( *app::Controll__TypeInfo )->static_fields->csCam ) )->camira->campos, current );
 
-							if ( angles.z <= Globals::Aimbot::DrawFOVSize )
+							//if ( angles.z <= Globals::Aimbot::DrawFOVSize )
+							//{
+							//	bestDistance = angles.z;
+
+							float x = ( *app::Controll__TypeInfo )->static_fields->rx;
+							float y = ( *app::Controll__TypeInfo )->static_fields->ry;
+							//	float normalDistance = angles.x;
+							//	float realDistance = y - normalDistance;
+
+							if ( angles.y < 0 ) angles.y = 360 + y;
+							if ( angles.x < 0 ) angles.x = 360 + x;
+
+							// Not in FOV
+							//if ( realDistance < -Globals::Aimbot::DrawFOVSize || realDistance > Globals::Aimbot::DrawFOVSize ) continue;
+							if ((out.x < (center.x + Globals::Aimbot::DrawFOVSize)) and (out.x > (center.x - Globals::Aimbot::DrawFOVSize))
+							and (out.y < (center.y + Globals::Aimbot::DrawFOVSize)) and (out.y > (center.y - Globals::Aimbot::DrawFOVSize)) || i == actorAim)
 							{
-								bestDistance = angles.z;
-
-								float x = ( *app::Controll__TypeInfo )->static_fields->rx;
-								float y = ( *app::Controll__TypeInfo )->static_fields->ry;
-								float normalDistance = angles.x;
-								float realDistance = y - normalDistance;
-
-								if ( angles.y < 0 ) angles.y = 360 + y;
-								if ( angles.x < 0 ) angles.x = 360 + x;
-
-								// Not in FOV
-								if ( realDistance < -Globals::Aimbot::DrawFOVSize || realDistance > Globals::Aimbot::DrawFOVSize ) continue;
-
-								utils::SetAngles( { angles.x, angles.y } );
+								actorAim = i;
+								if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
+									utils::SetAngles({ angles.x, angles.y });
+								}
 							}
+
+							//}
 						}
 
 						if ( Globals::Visuals::Boxes ) {
